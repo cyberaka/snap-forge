@@ -1,4 +1,4 @@
-package com.example.springaichat;
+package com.cyberaka.snapforge;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

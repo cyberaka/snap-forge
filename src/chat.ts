@@ -3,17 +3,28 @@ const chatSendBtn = document.getElementById("chatSendBtn") as HTMLButtonElement;
 const chatPanel = document.getElementById("chatPanel") as HTMLDivElement;
 
 // Function to handle sending a message
-function sendMessage() {
+async function sendMessage() {
   const message = chatInput.value.trim();
   if (!message) return;
 
   appendMessage(message, "user");
 
-  // Simulate server response
-  setTimeout(() => {
-    const response = `Server response to: "${message}"`;
-    appendMessage(response, "bot");
-  }, 500);
+  try {
+    // Make a POST request to http://localhost:8080/chat with the message
+    const response = await fetch('http://localhost:8080/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message })
+    });
+
+    if (response.ok) {
+      // If the response is OK, parse it as text
+      const responseData = await response.text();
+      appendMessage(responseData, "bot");
+    }
+  } catch (error) {
+    console.error('Error sending message:', error);
+  }
 
   chatInput.value = "";
 }
