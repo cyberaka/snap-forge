@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "concurrently \"tsc --watch\" \"lite-server\"",
     "start": "lite-server",
-    "watch": "tsc --watch"
+    "watch": "tsc --watch",
+    "prepare-docs": "node copy-to-docs.js"
   }
 }
