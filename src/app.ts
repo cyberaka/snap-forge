@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   sendBtn.addEventListener("click", () => {
     const img = document.createElement("img");
-    img.src = "https://via.placeholder.com/150";
+    img.src = "https://picsum.photos/150";
     img.className = "img-thumbnail w-25";
 
     const wrapper = document.createElement("div");

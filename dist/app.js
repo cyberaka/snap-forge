@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     sendBtn.addEventListener("click", function () {
         var img = document.createElement("img");
-        img.src = "https://via.placeholder.com/150";
+        img.src = "https://picsum.photos/150";
         img.className = "img-thumbnail w-25";
         var wrapper = document.createElement("div");
         wrapper.className = "d-flex align-items-center gap-2";
