@@ -1,0 +1,12 @@
+{
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "typescript": "^5.3.3",
+    "lite-server": "^2.6.1"
+  },
+  "scripts": {
+    "dev": "concurrently \"tsc --watch\" \"lite-server\"",
+    "start": "lite-server",
+    "watch": "tsc --watch"
+  }
+}
