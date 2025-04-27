@@ -1,38 +1,48 @@
 import sharp from "sharp";
 
-// Input parameters
+/**
+ * Input parameters
+ * - Paths to the source image, target image, and output image.
+ * - Dimensions of the source image and target image.
+ * - Subject box (area of interest in the source image) and placement point (where the subject will be placed on the target image).
+ */
 const sourceImagePath = "/Users/abhinavanand/Desktop/billi/source.png";
 const targetImagePath = "/Users/abhinavanand/Desktop/billi/target.png";
 const outputImagePath = "/Users/abhinavanand/Desktop/billi/output.png";
 
-const sourceImage = { width: 796, height: 452 };
-const subjectBox = { x: 283, y: 124, width: 306, height: 320 };
-const targetImage = { width: 452, height: 796 };
-const placementPoint = { x: 72, y: 236 };
+const sourceImage = { width: 796, height: 452 }; // Dimensions of the source image
+const subjectBox = { x: 283, y: 124, width: 306, height: 320 }; // Area of interest in the source image
+const targetImage = { width: 452, height: 796 }; // Dimensions of the target image
+const placementPoint = { x: 72, y: 236 }; // Point on the target image where the subject will be placed
 
+/**
+ * Calculates the crop area from the source image and the placement area on the target image.
+ * This ensures the subject is cropped and resized to fit the target image while maintaining its aspect ratio.
+ */
 function calculateCropAndPlacement() {
-  const subjectAspectRatio = subjectBox.width / subjectBox.height;
+  const subjectAspectRatio = subjectBox.width / subjectBox.height; // Aspect ratio of the subject
 
-  // Calculate max possible crop dimensions
+  // Calculate the maximum possible crop dimensions that fit within both the source and target images
   const maxCropWidth = Math.min(targetImage.width, sourceImage.width);
   const maxCropHeight = Math.min(targetImage.height, sourceImage.height);
 
   let cropWidth = maxCropWidth;
   let cropHeight = cropWidth / subjectAspectRatio;
 
+  // Adjust crop dimensions if the height exceeds the maximum allowed height
   if (cropHeight > maxCropHeight) {
     cropHeight = maxCropHeight;
     cropWidth = cropHeight * subjectAspectRatio;
   }
 
-  // Center crop around the subject
+  // Center the crop area around the subject
   const subjectCenterX = subjectBox.x + subjectBox.width / 2;
   const subjectCenterY = subjectBox.y + subjectBox.height / 2;
 
   let cropX = subjectCenterX - cropWidth / 2;
   let cropY = subjectCenterY - cropHeight / 2;
 
-  // Adjust crop to stay within source bounds
+  // Ensure the crop area stays within the bounds of the source image
   if (cropX < 0) cropX = 0;
   if (cropY < 0) cropY = 0;
   if (cropX + cropWidth > sourceImage.width)
@@ -47,7 +57,7 @@ function calculateCropAndPlacement() {
     height: Math.round(cropHeight),
   };
 
-  // Adjust placement point based on new crop
+  // Adjust the placement point on the target image based on the crop area
   const offsetX = subjectBox.x - cropBox.x;
   const offsetY = subjectBox.y - cropBox.y;
 
@@ -64,12 +74,19 @@ function calculateCropAndPlacement() {
   return { cropBox, placementBox };
 }
 
+/**
+ * Crops the subject from the source image based on the calculated crop area.
+ * @param sourceImagePath Path to the source image
+ * @param cropBox The area to crop from the source image
+ * @returns A buffer containing the cropped image
+ */
 async function cropSubject(
   sourceImagePath: string,
   cropBox: { x: number; y: number; width: number; height: number }
 ): Promise<Buffer> {
   const meta = await sharp(sourceImagePath).metadata();
 
+  // Adjust the crop box to ensure it stays within the bounds of the source image
   const adjustedCropBox = {
     left: Math.max(0, cropBox.x),
     top: Math.max(0, cropBox.y),
@@ -79,9 +96,18 @@ async function cropSubject(
 
   console.log("Adjusted Crop Box:", adjustedCropBox);
 
+  // Extract the cropped area from the source image
   return sharp(sourceImagePath).extract(adjustedCropBox).toBuffer();
 }
 
+/**
+ * Places the cropped subject onto the target image at the specified placement area.
+ * @param sourceImagePath Path to the source image
+ * @param targetImagePath Path to the target image
+ * @param cropBox The area to crop from the source image
+ * @param placementBox The area on the target image where the cropped subject will be placed
+ * @param outputImagePath Path to save the final output image
+ */
 async function placeSubjectOnExistingTarget(
   sourceImagePath: string,
   targetImagePath: string,
@@ -89,14 +115,15 @@ async function placeSubjectOnExistingTarget(
   placementBox: { x: number; y: number; width: number; height: number },
   outputImagePath: string
 ) {
+  // Crop the subject from the source image
   const subjectBuffer = await cropSubject(sourceImagePath, cropBox);
 
-  // Resize subject to fit placement box
+  // Resize the cropped subject to fit the placement area
   const resizedSubject = await sharp(subjectBuffer)
     .resize(placementBox.width, placementBox.height)
     .toBuffer();
 
-  // Composite onto target image
+  // Composite the resized subject onto the target image
   await sharp(targetImagePath)
     .composite([
       {
