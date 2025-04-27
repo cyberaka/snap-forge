@@ -119,3 +119,17 @@ https://<your-username>.github.io/snap-forge/
 ## 📄 License
 
 MIT License
+
+## How to run the Image Service
+
+### Install the sharp dependency
+
+```
+npm install sharp
+```
+
+### Start the program
+
+```
+npx ts-node src/ImageService.ts
+```
