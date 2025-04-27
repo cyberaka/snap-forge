@@ -1,13 +1,16 @@
 {
   "devDependencies": {
     "concurrently": "^9.1.2",
-    "typescript": "^5.3.3",
-    "lite-server": "^2.6.1"
+    "lite-server": "^2.6.1",
+    "typescript": "^5.3.3"
   },
   "scripts": {
     "dev": "concurrently \"tsc --watch\" \"lite-server\"",
     "start": "lite-server",
     "watch": "tsc --watch",
     "prepare-docs": "node copy-to-docs.js"
+  },
+  "dependencies": {
+    "sharp": "^0.34.1"
   }
 }
